@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IMC Store - Owner Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="owner-style.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>IMC Store</h2>
+        <p>Owner Dashboard</p>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+          <li><a href="#orders"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+          <li><a href="#customers"><i class="fas fa-users"></i> Customers</a></li>
+          <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+    
+    <main class="main-content">
+      <header class="main-header">
+        <div class="header-title">
+          <h1>Dashboard</h1>
+          <div class="notification-bell" id="notificationBell">
+            <i class="fas fa-bell"></i>
+            <span class="notification-count" id="notificationCount">0</span>
+          </div>
+        </div>
+        <div class="header-stats">
+          <div class="stat-card">
+            <h3>Today's Orders</h3>
+            <p id="todayOrders">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Monthly Revenue</h3>
+            <p id="monthlyRevenue">$0.00</p>
+          </div>
+          <div class="stat-card">
+            <h3>Total Customers</h3>
+            <p id="totalCustomers">0</p>
+          </div>
+        </div>
+      </header>
+      
+      <section class="content-section" id="dashboardSection">
+        <div class="recent-orders">
+          <h2>Recent Orders</h2>
+          <div class="orders-table" id="recentOrdersTable">
+            <!-- Orders will be loaded here -->
+          </div>
+        </div>
+      </section>
+      
+      <section class="content-section" id="ordersSection" style="display: none;">
+        <div class="section-header">
+          <h2>All Orders</h2>
+          <div class="search-box">
+            <input type="text" placeholder="Search orders...">
+            <button><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+        <div class="orders-table" id="allOrdersTable">
+          <!-- All orders will be loaded here -->
+        </div>
+      </section>
+      
+      <section class="content-section" id="customersSection" style="display: none;">
+        <div class="section-header">
+          <h2>Customers</h2>
+          <div class="search-box">
+            <input type="text" placeholder="Search customers...">
+            <button><i class="fas fa-search"></i></button>
+          </div>
+        </div>
+        <div class="customers-table" id="customersTable">
+          <!-- Customers will be loaded here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="owner-script.js"></script>
+</body>
+</html>

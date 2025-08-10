@@ -1,0 +1,339 @@
+<html><head>
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Your Orders - IMC Store</title> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> 
+  <style>
+    :root {
+      --primary: #2a9d8f;
+      --secondary: #264653;
+      --accent: #e63946;
+      --light: #f8f9fa;
+      --dark: #212529;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: var(--dark);
+    }
+    
+    header {
+      background-color: var(--secondary);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+    
+    .nav-icons {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .nav-icons a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+      position: relative;
+    }
+    
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: var(--accent);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+    
+    /* Search Form Styles */
+    .search-form {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    .search-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    
+    /* ORDERS LIST STYLES */
+    .orders-list {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .order-card {
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    
+    /* RECEIPT STYLES */
+    #receiptContainer {
+      display: none;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .receipt-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .print-btn {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 4px;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    
+    .error-message {
+      color: var(--accent);
+      margin-top: 1rem;
+      text-align: center;
+    }
+  </style> 
+</head>
+<body> 
+  <header> 
+    <div class="logo">IMC STORE</div> 
+    <div class="nav-icons"> 
+      <a href="orders.html"><i class="fas fa-history"></i></a> 
+      <a href="cart.html"><i class="fas fa-shopping-cart"></i> <span class="cart-count" id="cartCount">0</span></a> 
+    </div> 
+  </header> 
+
+  <div class="container"> 
+    <!-- Search Form -->
+    <div class="search-form">
+      <h2>View Your Order History</h2>
+      <p>Please enter your details to view your orders</p>
+      <div class="form-group">
+        <label for="customerName">Full Name</label>
+        <input type="text" id="customerName" placeholder="Enter your full name as used in order">
+      </div>
+      <div class="form-group">
+        <label for="customerEmail">Email Address</label>
+        <input type="email" id="customerEmail" placeholder="Enter your email address">
+      </div>
+      <button class="search-btn" onclick="searchOrders()">Search Orders</button>
+      <div id="errorMessage" class="error-message"></div>
+    </div>
+    
+    <!-- Orders List (Hidden by default) -->
+    <div id="ordersList" style="display: none;">
+      <h2>Your Orders</h2>
+      <div id="ordersContent"></div>
+    </div>
+    
+    <!-- Receipt Container (Hidden by default) -->
+    <div id="receiptContainer">
+      <div class="receipt-header">
+        <h2>Order Receipt</h2>
+        <p id="receiptOrderNumber"></p>
+        <p id="receiptDate"></p>
+      </div>
+      <div id="receiptContent"></div>
+      <button class="print-btn" onclick="window.print()">Print Receipt</button>
+      <button onclick="hideReceipt()" style="margin-top: 1rem;">Back to Orders</button>
+    </div>
+  </div> 
+
+  <script>
+    // Initialize storage
+    function initializeStorage() {
+      if (!localStorage.getItem('cart')) {
+        localStorage.setItem('cart', JSON.stringify([]));
+      }
+      if (!localStorage.getItem('customerOrders')) {
+        localStorage.setItem('customerOrders', JSON.stringify([]));
+      }
+    }
+
+    // Update cart count
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      document.getElementById('cartCount').textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+
+    // Search orders by customer name and email
+    function searchOrders() {
+      const name = document.getElementById('customerName').value.trim();
+      const email = document.getElementById('customerEmail').value.trim();
+      const errorMessage = document.getElementById('errorMessage');
+      
+      if (!name || !email) {
+        errorMessage.textContent = 'Please enter both your name and email address';
+        return;
+      }
+      
+      const orders = JSON.parse(localStorage.getItem('customerOrders')) || [];
+      const customerOrders = orders.filter(order => 
+        order.customer.name.toLowerCase() === name.toLowerCase() && 
+        order.customer.email.toLowerCase() === email.toLowerCase()
+      );
+      
+      if (customerOrders.length === 0) {
+        errorMessage.textContent = 'No orders found for this customer. Please check your details and try again.';
+        document.getElementById('ordersList').style.display = 'none';
+      } else {
+        errorMessage.textContent = '';
+        renderCustomerOrders(customerOrders);
+        document.getElementById('ordersList').style.display = 'block';
+      }
+    }
+
+    // Show receipt for an order
+    function showReceipt(orderId) {
+      const orders = JSON.parse(localStorage.getItem('customerOrders')) || [];
+      const order = orders.find(o => o.id == orderId);
+      
+      if (order) {
+        document.getElementById('ordersList').style.display = 'none';
+        document.getElementById('receiptContainer').style.display = 'block';
+        
+        // Format date
+        const orderDate = new Date(order.date);
+        const formattedDate = orderDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        // Build receipt HTML
+        let itemsHtml = '';
+        let subtotal = 0;
+        
+        order.items.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          subtotal += itemTotal;
+          itemsHtml += `
+            <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+              <div>${item.name} x${item.quantity}</div>
+              <div>$${itemTotal.toFixed(2)}</div>
+            </div>
+          `;
+        });
+        
+        document.getElementById('receiptOrderNumber').textContent = `Order #${order.id}`;
+        document.getElementById('receiptDate').textContent = formattedDate;
+        document.getElementById('receiptContent').innerHTML = `
+          <h3>Customer Information</h3>
+          <p>${order.customer.name}<br>
+          ${order.customer.email}<br>
+          ${order.customer.address}, ${order.customer.city}</p>
+          
+          <h3>Order Items</h3>
+          ${itemsHtml}
+          
+          <div style="border-top: 1px solid #eee; margin-top: 1rem; padding-top: 1rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <strong>Total:</strong>
+              <strong>$${subtotal.toFixed(2)}</strong>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Hide receipt and show orders
+    function hideReceipt() {
+      document.getElementById('receiptContainer').style.display = 'none';
+      document.getElementById('ordersList').style.display = 'block';
+    }
+
+    // Render customer's orders
+    function renderCustomerOrders(orders) {
+      const ordersContent = document.getElementById('ordersContent');
+      
+      let html = '';
+      orders.forEach(order => {
+        const orderDate = new Date(order.date);
+        const formattedDate = orderDate.toLocaleDateString();
+        const total = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        html += `
+          <div class="order-card">
+            <div style="display: flex; justify-content: space-between;">
+              <strong>Order #${order.id}</strong>
+              <span>${formattedDate}</span>
+            </div>
+            <div style="margin: 0.5rem 0;">
+              <strong>$${total.toFixed(2)}</strong> • ${order.items.length} item(s)
+            </div>
+            <div style="margin-top: 1rem;">
+              <a href="#" onclick="showReceipt(${order.id}); return false;">View Receipt</a>
+            </div>
+          </div>
+        `;
+      });
+      
+      ordersContent.innerHTML = html;
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeStorage();
+      updateCartCount();
+      // Don't render orders by default - require search first
+    });
+  </script>
+</body>
+</html>
